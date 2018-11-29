@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nf147.ssm.dao.EmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.nf147.ssm.entity.Employee">
+        <id column="employee_id" jdbcType="INTEGER" property="employeeId"/>
+        <result column="employee_num" jdbcType="VARCHAR" property="employeeNum"/>
+        <result column="employee_name" jdbcType="VARCHAR" property="employeeName"/>
+        <result column="employee_sex" jdbcType="INTEGER" property="employeeSex"/>
+        <result column="education_id" jdbcType="INTEGER" property="educationId"/>
+        <result column="employee_price" jdbcType="DECIMAL" property="employeePrice"/>
+
+        <collection property="education" ofType="com.nf147.ssm.entity.Education">
+            <id column="education_id" jdbcType="INTEGER" property="educationId"/>
+            <result column="education_name" jdbcType="VARCHAR" property="educationName"/>
+        </collection>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from employee
+        where employee_id = #{employeeId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.nf147.ssm.entity.Employee">
+        <selectKey keyProperty="employeeId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into employee (employee_id, employee_num, employee_name,
+        employee_sex, education_id, employee_price
+        )
+        values (#{employeeId,jdbcType=INTEGER}, #{employeeNum,jdbcType=VARCHAR}, #{employeeName,jdbcType=VARCHAR},
+        #{employeeSex,jdbcType=INTEGER}, #{educationId,jdbcType=INTEGER}, #{employeePrice,jdbcType=DECIMAL}
+        )
+    </insert>
+
+    <insert id="insertAll" parameterType="java.util.List">
+        <selectKey keyProperty="employeeId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into employee (employee_id, employee_num, employee_name,
+        employee_sex, education_id, employee_price
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.employeeId,jdbcType=INTEGER}, #{item.employeeNum,jdbcType=VARCHAR},
+            #{item.employeeName,jdbcType=VARCHAR},
+            #{item.employeeSex,jdbcType=INTEGER}, #{item.educationId,jdbcType=INTEGER},
+            #{item.employeePrice,jdbcType=DECIMAL}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.nf147.ssm.entity.Employee">
+        update employee
+        set employee_num = #{employeeNum,jdbcType=VARCHAR},
+        employee_name = #{employeeName,jdbcType=VARCHAR},
+        employee_sex = #{employeeSex,jdbcType=INTEGER},
+        education_id = #{educationId,jdbcType=INTEGER},
+        employee_price = #{employeePrice,jdbcType=DECIMAL}
+        where employee_id = #{employeeId,jdbcType=INTEGER}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select employee_id, employee_num, employee_name, employee_sex, education_id, employee_price
+        from employee
+        where employee_id = #{employeeId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select employee_id, employee_num, employee_name, employee_sex, ed.education_id, employee_price,education_name
+        from employee em inner join education ed on ed.education_id=em.education_id;
+    </select>
+    <select id="selectByNum" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select employee_id, employee_num, employee_name, employee_sex, ed.education_id, employee_price,education_name
+        from employee em inner join education ed on ed.education_id=em.education_id where employee_num=#{employee_num,jdbcType=VARCHAR}
+    </select>
+</mapper>
